@@ -1,21 +1,28 @@
 
+import {Request, Response} from 'express';
+import {db} from './database';
+import {USERS} from './database-data';
+import * as argon2 from 'argon2';
+import {validatePassword} from './password-validator';
 
 
-
-import {Request, Response} from "express";
-import {db} from "./database";
-import {USERS} from "./database-data";
-
-
-
-export function createUser(req: Request, res:Response) {
+export function createUser(req: Request, res: Response) {
 
     const credentials = req.body;
 
-    const user = db.createUser(credentials.email, credentials.password);
+    const errors = validatePassword(credentials.password);
 
-    console.log(USERS);
+    if (errors.length > 0) {
+      res.status(400).json({errors});
+    } else {
+      argon2.hash(credentials.password)
+        .then(passwordDigest => {
+          const user = db.createUser(credentials.email, passwordDigest);
 
-    res.status(200).json({id:user.id, email:user.email});
+          console.log(USERS);
+
+          res.status(200).json({id: user.id, email: user.email});
+        });
+    }
 
 }
