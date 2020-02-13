@@ -1,22 +1,24 @@
 
-import {tap, shareReplay, map} from 'rxjs/operators';
+import {tap, shareReplay, map, filter} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Observable, BehaviorSubject} from "rxjs";
-import {User} from "../model/user";
+import {HttpClient} from '@angular/common/http';
+import {Observable, BehaviorSubject} from 'rxjs';
+import {User} from '../model/user';
 
 export const ANONYMOUS_USER: User = {
     id: undefined,
     email: ''
-}
-
+};
 
 @Injectable()
 export class AuthService {
 
-    private subject = new BehaviorSubject<User>(ANONYMOUS_USER);
+    private subject = new BehaviorSubject<User>(undefined);
 
-    user$: Observable<User> = this.subject.asObservable();
+    user$: Observable<User> = this.subject.asObservable()
+      .pipe(
+        filter(user => !!user)
+      );
 
     isLoggedIn$: Observable<boolean> = this.user$.pipe(map(user => !!user.id));
 
@@ -24,15 +26,33 @@ export class AuthService {
 
     constructor(private http: HttpClient) {
 
+      this.http.get<User>('/api/user')
+        .subscribe(user => this.subject.next(user ? user : ANONYMOUS_USER));
 
     }
 
-    signUp(email:string, password:string ) {
-
-        return this.http.post<User>('/api/signup', {email, password}).pipe(
+    signUp(email: string, password: string ) {
+        return this.http.post<User>('/api/signup', {email, password})
+          .pipe(
             shareReplay(),
-            tap(user => this.subject.next(user)),);
-
+            tap(user => this.subject.next(user))
+          );
     }
+
+  logout(): Observable<any> {
+      return this.http.post('/api/logout', null, {responseType: 'text'} )
+        .pipe(
+          shareReplay(),
+          tap(user => this.subject.next(ANONYMOUS_USER))
+        );
+  }
+
+  login(email: string, password: string ) {
+    return this.http.post<User>('/api/login', {email, password})
+      .pipe(
+        shareReplay(),
+        tap(user => this.subject.next(user))
+      );
+  }
 
 }

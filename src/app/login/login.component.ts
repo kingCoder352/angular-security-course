@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AuthService} from "../services/auth.service";
-import {Router} from "@angular/router";
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {AuthService} from '../services/auth.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'login',
@@ -10,19 +10,23 @@ import {Router} from "@angular/router";
 })
 export class LoginComponent implements OnInit {
 
-    form:FormGroup;
+    form: FormGroup;
 
     messagePerErrorCode = {
-        loginfailed: "Invalid credentials"
+        loginfailed: 'Invalid credentials'
     };
 
     errors = [];
 
-    constructor(private fb:FormBuilder, private authService: AuthService, private router: Router) {
+    constructor(
+      private fb: FormBuilder,
+      private authService: AuthService,
+      private router: Router
+    ) {
 
         this.form = this.fb.group({
-            email: ['test@gmail.com',Validators.required],
-            password: ['Password10',Validators.required]
+            email: ['test@gmail.com', Validators.required],
+            password: ['Password10', Validators.required]
         });
 
     }
@@ -37,7 +41,11 @@ export class LoginComponent implements OnInit {
 
         if (val.email && val.password) {
 
-            //TODO
+            this.authService.login(val.email, val.password)
+              .subscribe(() => {
+                console.log('User successfully logged in');
+                this.router.navigateByUrl('/');
+              });
 
         }
 
