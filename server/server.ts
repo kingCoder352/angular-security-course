@@ -11,6 +11,7 @@ import {logout} from './logout.route';
 import {login} from './login.route';
 import {retrieveUserIdFromRequest} from './get-user.middleware';
 import {checkIfAuthenticated} from './auth.middleware';
+import {checkCsrfToken} from './csrf.middleware';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
@@ -42,7 +43,7 @@ app.route('/api/user')
     .get(getUser);
 
 app.route('/api/logout')
-    .post( logout);
+    .post(checkIfAuthenticated, checkCsrfToken, logout);
 
 app.route('/api/login')
     .post(login);
@@ -58,8 +59,7 @@ if (options.secure) {
     // launch an HTTPS Server. Note: this does NOT mean that the application is secure
     httpsServer.listen(9000, () => console.log('HTTPS Secure Server running at https://localhost:' + httpsServer.address().port));
 
-}
-else {
+} else {
 
     // launch an HTTP Server
     const httpServer = app.listen(9000, () => {

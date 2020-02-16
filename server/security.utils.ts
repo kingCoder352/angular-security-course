@@ -2,6 +2,7 @@ const crypto = require('crypto');
 import * as promisify from 'util.promisify';
 import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
+import * as argon2 from 'argon2';
 
 
 
@@ -30,4 +31,8 @@ export async function decodeJwt(token: string) {
   console.log('decoded JWT payload', payload);
 
   return payload;
+}
+
+export async function createCsrfToken(sessionToken: string) {
+  return argon2.hash(sessionToken);
 }
