@@ -9,7 +9,7 @@ export const routesConfig: Routes = [
     },
     {
         path: '',
-        redirectTo:'/lessons',
+        redirectTo: '/lessons',
         pathMatch: 'full'
     },
     {

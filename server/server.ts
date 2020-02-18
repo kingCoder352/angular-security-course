@@ -1,11 +1,14 @@
 
 
 import * as express from 'express';
-import {Application} from "express";
+import {Application} from 'express';
 import * as fs from 'fs';
 import * as https from 'https';
-import {readAllLessons} from "./read-all-lessons.route";
+import {readAllLessons} from './read-all-lessons.route';
+import {userInfo} from './user-info.route';
 const bodyParser = require('body-parser');
+const jwksRsa = require('jwks-rsa');
+const jwt = require('express-jwt');
 
 const app: Application = express();
 
@@ -19,10 +22,31 @@ const optionDefinitions = [
 
 const options = commandLineArgs(optionDefinitions);
 
+const checkIfAuthenticated = jwt({
+  algorithms: ['RS256'],
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksUri: 'https://the-savage-coder.auth0.com/.well-known/jwks.json'
+  })
+});
+
+app.use(checkIfAuthenticated);
+
+app.use((err, req, res, next) => {
+  if (err && err.name === 'UnauthorizedError') {
+    res.status(err.status).json({message: err.message});
+  } else {
+    next();
+  }
+});
+
 // REST API
 app.route('/api/lessons')
     .get(readAllLessons);
 
+app.route('/api/userInfo')
+  .put(userInfo);
 
 if (options.secure) {
 
@@ -32,14 +56,13 @@ if (options.secure) {
     }, app);
 
     // launch an HTTPS Server. Note: this does NOT mean that the application is secure
-    httpsServer.listen(9000, () => console.log("HTTPS Secure Server running at https://localhost:" + httpsServer.address().port));
+    httpsServer.listen(9000, () => console.log('HTTPS Secure Server running at https://localhost:' + httpsServer.address().port));
 
-}
-else {
+} else {
 
     // launch an HTTP Server
     const httpServer = app.listen(9000, () => {
-        console.log("HTTP Server running at https://localhost:" + httpServer.address().port);
+        console.log('HTTP Server running at https://localhost:' + httpServer.address().port);
     });
 
 }

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService} from "./services/auth.service";
-import {Observable} from "rxjs";
-import {User} from "./model/user";
+import {AuthService} from './services/auth.service';
+import {Observable} from 'rxjs';
+import {User} from './model/user';
 
 @Component({
   selector: 'app-root',
@@ -10,12 +10,12 @@ import {User} from "./model/user";
 })
 export class AppComponent  implements OnInit {
 
-    constructor(private auth:AuthService) {
+    constructor(private auth: AuthService) {
 
     }
 
     ngOnInit() {
-
+      this.auth.retrieveAuthInfoFromUrl();
     }
 
     signUp() {
