@@ -6,26 +6,15 @@ import { AppComponent } from './app.component';
 import { LessonsComponent } from './lessons/lessons.component';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
-import {routesConfig} from "./routes.config";
-import {LessonsService} from "./services/lessons.service";
-import {ReactiveFormsModule} from "@angular/forms";
+import {routesConfig} from './routes.config';
+import {LessonsService} from './services/lessons.service';
+import {ReactiveFormsModule} from '@angular/forms';
 
-import {AuthService} from "./services/auth.service";
+import {AuthService} from './services/auth.service';
 import { AdminComponent } from './admin/admin.component';
-import { RouterModule} from "@angular/router";
-
-
-
-
-
-
-
-
-
-
-
-
-
+import {Router, RouterModule} from '@angular/router';
+import {RbacAllowDirective} from './common/rbac-allow.directive';
+import {AuthorizationGuard} from './services/authorization.guard';
 
 @NgModule({
   declarations: [
@@ -33,7 +22,8 @@ import { RouterModule} from "@angular/router";
     LessonsComponent,
     LoginComponent,
     SignupComponent,
-    AdminComponent
+    AdminComponent,
+    RbacAllowDirective
   ],
   imports: [
     BrowserModule,
@@ -47,7 +37,19 @@ import { RouterModule} from "@angular/router";
   ],
   providers: [
       LessonsService,
-      AuthService
+      AuthService,
+    {
+      provide: 'adminsOnlyGuard',
+      useFactory: (
+        authService: AuthService,
+        router: Router
+      ) =>
+        new AuthorizationGuard(['ADMIN'], authService, router),
+      deps: [
+        AuthService,
+        Router
+      ]
+    }
   ],
   bootstrap: [AppComponent]
 })

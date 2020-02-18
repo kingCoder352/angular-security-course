@@ -5,8 +5,7 @@ export function checkIfAuthenticated(req: Request, res: Response, next: NextFunc
 
     if (req['user']) {
         next();
-    }
-    else {
+    } else {
         res.sendStatus(403);
     }
 

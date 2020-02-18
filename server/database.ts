@@ -1,7 +1,7 @@
 
 import * as _ from 'lodash';
-import {LESSONS, USERS} from "./database-data";
-import {DbUser} from "./db-user";
+import {LESSONS, USERS} from './database-data';
+import {DbUser} from './db-user';
 
 
 class InMemoryDatabase {
@@ -12,12 +12,12 @@ class InMemoryDatabase {
         return _.values(LESSONS);
     }
 
-    createUser(email:string,passwordDigest:string) {
+    createUser(email: string, passwordDigest: string) {
 
-        const usersPerEmail = _.keyBy( _.values(USERS), "email" );
+        const usersPerEmail = _.keyBy( _.values(USERS), 'email' );
 
         if (usersPerEmail[email]) {
-            const message = "An user already exists with email " + email;
+            const message = 'An user already exists with email ' + email;
             console.error(message);
             throw new Error(message);
         }
@@ -30,7 +30,7 @@ class InMemoryDatabase {
             id,
             email,
             passwordDigest,
-            roles: ["STUDENT"]
+            roles: ['STUDENT']
         };
 
         USERS[id] = user;
@@ -41,32 +41,32 @@ class InMemoryDatabase {
     }
 
 
-    findUserByEmail(email:string) :DbUser {
+    findUserByEmail(email: string): DbUser {
 
-        console.log("Finding user by email:", email);
+        console.log('Finding user by email:', email);
 
         const users = _.values(USERS);
 
         const user = _.find(users, user => user.email === email);
 
-        console.log("user retrieved:", user);
+        console.log('user retrieved:', user);
 
         return user;
     }
 
-    findUserById(userId:string) :DbUser {
+    findUserById(userId: string): DbUser {
 
         let user = undefined;
 
         if (userId) {
 
-            console.log("looking for userId ", userId);
+            console.log('looking for userId ', userId);
 
             const users = _.values(USERS);
 
             user = _.find(users, user => user.id.toString() === userId);
 
-            console.log("user data found:", user);
+            console.log('user data found:', user);
         }
 
         return user;
